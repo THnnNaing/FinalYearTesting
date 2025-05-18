@@ -1,35 +1,38 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\HR\DashboardController as HRDashboardController;
-use App\Http\Controllers\Employee\DashboardController as EmployeeDashboardController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// routes/web.php
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\JobTitleController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\PayrollController;
+use App\Http\Controllers\DeductionController;
+use App\Http\Controllers\BonusController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\LeaveController;
 
-Auth::routes();
+// Public routes (if any)
+// Breeze authentication routes are included via auth.php
 
-Route::get('/register', [RegisterController::class, 'create'])->name('register');
-Route::post('/register', [RegisterController::class, 'store']);
-
+// Protected routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-    
-    // Admin routes
-    Route::prefix('admin')->name('admin.')->middleware('role:Admin')->group(function () {
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    });
-    
-    // HR routes
-    Route::prefix('hr')->name('hr.')->middleware('role:HR')->group(function () {
-        Route::get('/dashboard', [HRDashboardController::class, 'index'])->name('dashboard');
-    });
-    
-    // Employee routes
-    Route::prefix('employee')->name('employee.')->middleware('role:Employee')->group(function () {
-        Route::get('/dashboard', [EmployeeDashboardController::class, 'index'])->name('dashboard');
-    });
+    // Dashboard
+    Route::get('/', function () {
+        return view('dashboard');
+    })->name('dashboard');
+
+    // Resource routes
+    Route::resource('departments', DepartmentController::class);
+    Route::resource('job-titles', JobTitleController::class);
+    Route::resource('employees', EmployeeController::class);
+    Route::resource('payrolls', PayrollController::class);
+    Route::resource('deductions', DeductionController::class);
+    Route::resource('bonuses', BonusController::class);
+    Route::resource('attendances', AttendanceController::class);
+    Route::resource('leaves', LeaveController::class);
 });
+
+// Include Breeze authentication routes
+require __DIR__.'/auth.php';

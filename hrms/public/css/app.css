@@ -1,0 +1,21 @@
+/* resources/css/app.css */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Your custom styles */
+nav {
+    @apply bg-gray-800 text-white p-4;
+}
+nav a {
+    @apply mx-2;
+}
+table {
+    @apply w-full border-collapse;
+}
+th, td {
+    @apply border p-2 text-left;
+}
+th {
+    @apply bg-gray-200;
+}
