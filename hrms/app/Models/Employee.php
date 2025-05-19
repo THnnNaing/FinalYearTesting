@@ -9,7 +9,7 @@ class Employee extends Model
 {
     protected $fillable = [
         'first_name', 'last_name', 'email', 'phone', 'address',
-        'date_of_birth', 'hire_date', 'department_id', 'job_title_id', 'status'
+        'date_of_birth', 'hire_date', 'department_id', 'job_title_id', 'status', 'user_id'
     ];
 
     public function department()
@@ -20,6 +20,11 @@ class Employee extends Model
     public function jobTitle()
     {
         return $this->belongsTo(JobTitle::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function payrolls()

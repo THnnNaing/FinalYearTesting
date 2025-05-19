@@ -1,11 +1,10 @@
 <?php
 
-// app/Http/Controllers/EmployeeController.php
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
-use App\Models\JobTitle;
 use App\Models\Department;
+use App\Models\JobTitle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,8 +13,11 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = Employee::with(['department', 'jobTitle'])
-            ->where('user_id', Auth::id()) // Optional: restrict to user’s employees
+            ->when(Auth::user() && Auth::user()->role === 'employee', function ($query) {
+                return $query->where('user_id', Auth::id());
+            })
             ->get();
+
         return view('employees.index', compact('employees'));
     }
 
@@ -39,14 +41,19 @@ class EmployeeController extends Controller
             'department_id' => 'required|exists:departments,id',
             'job_title_id' => 'required|exists:job_titles,id',
             'status' => 'required|in:active,inactive,terminated',
+            'user_id' => 'nullable|exists:users,id',
         ]);
 
         Employee::create($validated);
-        return redirect()->route('employees.index')->with('success', 'Employee added.');
+        return redirect()->route('employees.index')->with('success', 'Employee added successfully.');
     }
 
     public function edit(Employee $employee)
     {
+        if (Auth::user() && Auth::user()->role === 'employee' && $employee->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized: You can only edit your own profile.');
+        }
+
         $departments = Department::all();
         $jobTitles = JobTitle::all();
         return view('employees.edit', compact('employee', 'departments', 'jobTitles'));
@@ -54,6 +61,10 @@ class EmployeeController extends Controller
 
     public function update(Request $request, Employee $employee)
     {
+        if (Auth::user() && Auth::user()->role === 'employee' && $employee->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized: You can only edit your own profile.');
+        }
+
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -65,15 +76,16 @@ class EmployeeController extends Controller
             'department_id' => 'required|exists:departments,id',
             'job_title_id' => 'required|exists:job_titles,id',
             'status' => 'required|in:active,inactive,terminated',
+            'user_id' => 'nullable|exists:users,id',
         ]);
 
         $employee->update($validated);
-        return redirect()->route('employees.index')->with('success', 'Employee updated.');
+        return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
     }
 
     public function destroy(Employee $employee)
     {
         $employee->delete();
-        return redirect()->route('employees.index')->with('success', 'Employee deleted.');
+        return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
     }
 }

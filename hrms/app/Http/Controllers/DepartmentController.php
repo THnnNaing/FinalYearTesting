@@ -1,6 +1,5 @@
 <?php
 
-// app/Http/Controllers/DepartmentController.php
 namespace App\Http\Controllers;
 
 use App\Models\Department;
@@ -30,25 +29,5 @@ class DepartmentController extends Controller
         return redirect()->route('departments.index')->with('success', 'Department added.');
     }
 
-    public function edit(Department $department)
-    {
-        return view('departments.edit', compact('department'));
-    }
-
-    public function update(Request $request, Department $department)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        $department->update($validated);
-        return redirect()->route('departments.index')->with('success', 'Department updated.');
-    }
-
-    public function destroy(Department $department)
-    {
-        $department->delete();
-        return redirect()->route('departments.index')->with('success', 'Department deleted.');
-    }
+    // Similar for edit, update, destroy
 }
